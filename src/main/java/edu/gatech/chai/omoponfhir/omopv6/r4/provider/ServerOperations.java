@@ -57,10 +57,10 @@ public class ServerOperations {
 			) {
 		Bundle retVal = new Bundle();
 		MessageHeader messageHeader = null;
-		List<BundleEntryComponent> resources = new ArrayList<BundleEntryComponent>();
+//		List<BundleEntryComponent> resources = new ArrayList<BundleEntryComponent>();
+		List<BundleEntryComponent> entries = theContent.getEntry();
 		
 		if (theContent.getType() == BundleType.MESSAGE) {
-			List<BundleEntryComponent> entries = theContent.getEntry();
 			// Evaluate the first entry, which must be MessageHeader
 //			BundleEntryComponent entry1 = theContent.getEntryFirstRep();
 //			Resource resource = entry1.getResource();
@@ -73,12 +73,7 @@ public class ServerOperations {
 				Coding event = messageHeader.getEventCoding();
 //				Coding obsprovided = new Coding("http://hl7.org/fhir/message-events", "observation-provide", "Provide a simple observation or update a previously provided simple observation.");
 				Coding obsprovided = new Coding("http://terminology.hl7.org/CodeSystem/observation-category", "laboratory", "Laboratory");
-				if (CodeableConceptUtil.compareCodings(event, obsprovided) == 0) {
-					// This is lab report. they are all to be added to the server.
-					for (int i=1; i<entries.size(); i++) {
-						resources.add(entries.get(i));
-					}
-				} else {
+				if (CodeableConceptUtil.compareCodings(event, obsprovided) != 0) {
 					ThrowFHIRExceptions.unprocessableEntityException(
 							"We currently support only observation-provided Message event");
 				}
@@ -92,7 +87,7 @@ public class ServerOperations {
 
 		List<BundleEntryComponent> resultEntries = null;
 		try {
-			resultEntries = myMapper.createEntries(resources);
+			resultEntries = myMapper.createEntries(entries);
 			messageHeaderResponse.setCode(ResponseType.OK);
 		} catch (FHIRException e) {
 			e.printStackTrace();
