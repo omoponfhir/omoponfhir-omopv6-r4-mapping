@@ -26,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Operation;
@@ -35,6 +34,7 @@ import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import edu.gatech.chai.omoponfhir.omopv6.r4.mapping.OmopConceptMap;
+import edu.gatech.chai.omoponfhir.omopv6.r4.utilities.StaticValues;
 
 public class ConceptMapResourceProvider implements IResourceProvider {
 	private static final Logger logger = LoggerFactory.getLogger(ConceptMapResourceProvider.class);
@@ -43,7 +43,6 @@ public class ConceptMapResourceProvider implements IResourceProvider {
 	private String myDbType;
 	private OmopConceptMap myMapper;
 	private int preferredPageSize = 30;
-	private FhirContext fhirContext;
 
 	public ConceptMapResourceProvider() {
 		myAppCtx = ContextLoaderListener.getCurrentWebApplicationContext();
@@ -71,10 +70,6 @@ public class ConceptMapResourceProvider implements IResourceProvider {
 
 	public static String getType() {
 		return "ConceptMap";
-	}
-
-	public void setFhirContext(FhirContext fhirContext) {
-		this.fhirContext = fhirContext;
 	}
 
 	@Read()
@@ -141,7 +136,7 @@ public class ConceptMapResourceProvider implements IResourceProvider {
 						
 						if (response.getStatusCode().equals(HttpStatus.OK)) {
 							String result = response.getBody();
-							IParser fhirJsonParser = fhirContext.newJsonParser();
+							IParser fhirJsonParser = StaticValues.myFhirContext.newJsonParser();
 							Parameters parameters = fhirJsonParser.parseResource(Parameters.class, result);
 							if (parameters != null && !parameters.isEmpty()) {
 								logger.debug("$translate: responding parameters from external server, " + remoteMappingTerminologyUrl);

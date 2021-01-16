@@ -32,7 +32,7 @@ import org.hl7.fhir.r4.model.codesystems.ConditionCategory;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.context.ContextLoaderListener;
+import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
@@ -40,8 +40,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class OmopCondition extends BaseOmopResource<Condition, ConditionOccurrence, ConditionOccurrenceService>
-		implements IResourceMapping<Condition, ConditionOccurrence> {
+public class OmopCondition extends BaseOmopResource<Condition, ConditionOccurrence, ConditionOccurrenceService> {
 
 	private static final Logger logger = LoggerFactory.getLogger(OmopCondition.class);
 
@@ -60,18 +59,22 @@ public class OmopCondition extends BaseOmopResource<Condition, ConditionOccurren
 	}
 
 	public OmopCondition() {
-		super(ContextLoaderListener.getCurrentWebApplicationContext(), ConditionOccurrence.class,
+		super(ContextLoader.getCurrentWebApplicationContext(), ConditionOccurrence.class,
 				ConditionOccurrenceService.class, ConditionResourceProvider.getType());
-		initialize(ContextLoaderListener.getCurrentWebApplicationContext());
+		initialize(ContextLoader.getCurrentWebApplicationContext());
 	}
 
 	private void initialize(WebApplicationContext context) {
 		// Get bean for other services that we need for mapping.
-		conditionOccurrenceService = context.getBean(ConditionOccurrenceService.class);
-		fPersonService = context.getBean(FPersonService.class);
-		providerService = context.getBean(ProviderService.class);
-		conceptService = context.getBean(ConceptService.class);
-		visitOccurrenceService = context.getBean(VisitOccurrenceService.class);
+		if (context != null) {
+			conditionOccurrenceService = context.getBean(ConditionOccurrenceService.class);
+			fPersonService = context.getBean(FPersonService.class);
+			providerService = context.getBean(ProviderService.class);
+			conceptService = context.getBean(ConceptService.class);
+			visitOccurrenceService = context.getBean(VisitOccurrenceService.class);
+		} else {
+			logger.error("context must be NOT null");
+		}
 		
 		// Get count and put it in the counts.
 		getSize();
@@ -265,7 +268,7 @@ public class OmopCondition extends BaseOmopResource<Condition, ConditionOccurren
 			paramWrapper.setRelationship("or");
 			mapList.add(paramWrapper);
 			break;
-		case Procedure.SP_RES_ID:
+		case Condition.SP_RES_ID:
 			String conditionId = ((TokenParam) value).getValue();
 			paramWrapper.setParameterType("Long");
 			paramWrapper.setParameters(Arrays.asList("id"));
@@ -460,7 +463,6 @@ public class OmopCondition extends BaseOmopResource<Condition, ConditionOccurren
 			try {
 				throw new FHIRException("FHIR Resource does not contain a Subject.");
 			} catch (FHIRException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
