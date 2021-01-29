@@ -30,6 +30,7 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 
 import ca.uhn.fhir.rest.param.DateParam;
+import ca.uhn.fhir.rest.param.DateRangeParam;
 import ca.uhn.fhir.rest.param.ParamPrefixEnum;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.TokenParam;
@@ -40,6 +41,7 @@ import edu.gatech.chai.omoponfhir.omopv6.r4.provider.MedicationStatementResource
 import edu.gatech.chai.omoponfhir.omopv6.r4.provider.PatientResourceProvider;
 import edu.gatech.chai.omoponfhir.omopv6.r4.provider.PractitionerResourceProvider;
 import edu.gatech.chai.omoponfhir.omopv6.r4.utilities.CodeableConceptUtil;
+import edu.gatech.chai.omoponfhir.omopv6.r4.utilities.DateUtil;
 import edu.gatech.chai.omoponfhir.omopv6.r4.utilities.ExtensionUtil;
 import edu.gatech.chai.omopv6.dba.service.ConceptService;
 import edu.gatech.chai.omopv6.dba.service.DrugExposureService;
@@ -390,31 +392,34 @@ public class OmopMedicationRequest extends BaseOmopResource<MedicationRequest, D
 			}
 			break;
 		case MedicationRequest.SP_AUTHOREDON:
-			DateParam authoredOnDataParam = ((DateParam) value);
-			ParamPrefixEnum apiOperator = authoredOnDataParam.getPrefix();
-			String sqlOperator = null;
-			if (apiOperator.equals(ParamPrefixEnum.GREATERTHAN)) {
-				sqlOperator = ">";
-			} else if (apiOperator.equals(ParamPrefixEnum.GREATERTHAN_OR_EQUALS)) {
-				sqlOperator = ">=";
-			} else if (apiOperator.equals(ParamPrefixEnum.LESSTHAN)) {
-				sqlOperator = "<";
-			} else if (apiOperator.equals(ParamPrefixEnum.LESSTHAN_OR_EQUALS)) {
-				sqlOperator = "<=";
-			} else if (apiOperator.equals(ParamPrefixEnum.NOT_EQUAL)) {
-				sqlOperator = "!=";
-			} else {
-				sqlOperator = "=";
-			}
-			Date authoredOnDate = authoredOnDataParam.getValue();
-			
-			paramWrapper.setParameterType("Date");
-			paramWrapper.setParameters(Arrays.asList("drugExposureStartDate"));
-			paramWrapper.setOperators(Arrays.asList(sqlOperator));
-			paramWrapper.setValues(Arrays.asList(String.valueOf(authoredOnDate.getTime())));
-			paramWrapper.setRelationship("or");
-			mapList.add(paramWrapper);
+			DateRangeParam authoredOnDateRange = ((DateRangeParam) value);
+			DateUtil.constructParameterWrapper(authoredOnDateRange, "drugExposureStartDate", paramWrapper, mapList);
 			break;
+			// DateParam authoredOnDataParam = ((DateParam) value);
+			// ParamPrefixEnum apiOperator = authoredOnDataParam.getPrefix();
+			// String sqlOperator = null;
+			// if (apiOperator.equals(ParamPrefixEnum.GREATERTHAN)) {
+			// 	sqlOperator = ">";
+			// } else if (apiOperator.equals(ParamPrefixEnum.GREATERTHAN_OR_EQUALS)) {
+			// 	sqlOperator = ">=";
+			// } else if (apiOperator.equals(ParamPrefixEnum.LESSTHAN)) {
+			// 	sqlOperator = "<";
+			// } else if (apiOperator.equals(ParamPrefixEnum.LESSTHAN_OR_EQUALS)) {
+			// 	sqlOperator = "<=";
+			// } else if (apiOperator.equals(ParamPrefixEnum.NOT_EQUAL)) {
+			// 	sqlOperator = "!=";
+			// } else {
+			// 	sqlOperator = "=";
+			// }
+			// Date authoredOnDate = authoredOnDataParam.getValue();
+			
+			// paramWrapper.setParameterType("Date");
+			// paramWrapper.setParameters(Arrays.asList("drugExposureStartDate"));
+			// paramWrapper.setOperators(Arrays.asList(sqlOperator));
+			// paramWrapper.setValues(Arrays.asList(String.valueOf(authoredOnDate.getTime())));
+			// paramWrapper.setRelationship("or");
+			// mapList.add(paramWrapper);
+			// break;
 //		case MedicationRequest.SP_PATIENT:
 //		case MedicationRequest.SP_SUBJECT:
 //			ReferenceParam patientReference = ((ReferenceParam) value);
