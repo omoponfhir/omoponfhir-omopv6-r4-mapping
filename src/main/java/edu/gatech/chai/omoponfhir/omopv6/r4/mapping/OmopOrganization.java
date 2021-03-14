@@ -52,6 +52,7 @@ public class OmopOrganization extends BaseOmopResource<Organization, CareSite, C
 
 	public OmopOrganization(WebApplicationContext context) {
 		super(context, CareSite.class, CareSiteService.class, OrganizationResourceProvider.getType());
+		initialize(ContextLoaderListener.getCurrentWebApplicationContext());
 		
 	}
 
@@ -123,13 +124,14 @@ public class OmopOrganization extends BaseOmopResource<Organization, CareSite, C
 			CareSite existingCareSite = null;
 			String careSiteSourceValue = null;
 			for (Identifier identifier: identifiers) {
-				if (identifier.getValue().isEmpty() == false) {
+				if (!identifier.getValue().isEmpty()) {
 					careSiteSourceValue = identifier.getValue();
-					
-					existingCareSite = getMyOmopService().searchByColumnString("careSiteSourceValue", careSiteSourceValue).get(0);
-					if (existingCareSite != null) {
-						omopId = existingCareSite.getId();
-						break;
+					if(!getMyOmopService().searchByColumnString("careSiteSourceValue", careSiteSourceValue).isEmpty()) {
+						existingCareSite = getMyOmopService().searchByColumnString("careSiteSourceValue", careSiteSourceValue).get(0);
+						if (existingCareSite != null) {
+							omopId = existingCareSite.getId();
+							break;
+						}
 					}
 				}
 			}
