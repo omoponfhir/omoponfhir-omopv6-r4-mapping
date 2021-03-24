@@ -227,7 +227,7 @@ public class OmopOrganization extends BaseOmopResource<Organization, CareSite, C
 				try {
 					throw new FHIRException(myOrganization.getId() + " does not exist");
 				} catch (FHIRException e) {
-					// TODO Auto-generated catch block					e.printStackTrace();
+					e.printStackTrace();
 				}
 			} else {
 				location = careSite.getLocation();

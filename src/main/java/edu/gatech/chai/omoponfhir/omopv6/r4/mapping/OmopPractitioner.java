@@ -319,14 +319,9 @@ public class OmopPractitioner extends BaseOmopResource<Practitioner, Provider, P
 
 		if (omopId != null) {
 			omopProvider = getMyOmopService().findById(omopId);
-			if (omopProvider == null) {
-				try {
-					throw new FHIRException(practitioner.getId() + " does not exist");
-				} catch (FHIRException e) {
-					e.printStackTrace();
-				}
-			}
-		} else {
+		} 
+		
+		if(omopProvider == null) {
 			omopProvider = new Provider();
 		}
 		
