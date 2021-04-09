@@ -157,11 +157,14 @@ public class OmopPractitioner extends BaseOmopResource<Practitioner, Provider, P
 
 				// See if we have existing patient
 				// with this identifier.
-				allreadyIdentifiedProvider = getMyOmopService().searchByColumnString("providerSourceValue", providerSourceValue).get(0);
-				if (allreadyIdentifiedProvider != null) {
-					omopId = allreadyIdentifiedProvider.getId();
-					break;
+				if(!getMyOmopService().searchByColumnString("providerSourceValue", providerSourceValue).isEmpty()) {
+					allreadyIdentifiedProvider = getMyOmopService().searchByColumnString("providerSourceValue", providerSourceValue).get(0);
+					if (allreadyIdentifiedProvider != null) {
+						omopId = allreadyIdentifiedProvider.getId();
+						break;
+					}
 				}
+
 			}
 		}
 		
@@ -316,14 +319,9 @@ public class OmopPractitioner extends BaseOmopResource<Practitioner, Provider, P
 
 		if (omopId != null) {
 			omopProvider = getMyOmopService().findById(omopId);
-			if (omopProvider == null) {
-				try {
-					throw new FHIRException(practitioner.getId() + " does not exist");
-				} catch (FHIRException e) {
-					e.printStackTrace();
-				}
-			}
-		} else {
+		} 
+		
+		if(omopProvider == null) {
 			omopProvider = new Provider();
 		}
 		

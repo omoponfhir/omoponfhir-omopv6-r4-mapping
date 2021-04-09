@@ -2160,8 +2160,14 @@ public class OmopObservation extends BaseOmopResource<Observation, FObservationV
 			mapList.add(paramWrapper);
 			break;
 		case Observation.SP_DATE:
-			DateRangeParam dateRangeParam = ((DateRangeParam) value);
- 			DateUtil.constructParameterWrapper(dateRangeParam, "observationDate", paramWrapper, mapList);
+			if(value instanceof DateRangeParam ) {
+				DateRangeParam dateRangeParam = ((DateRangeParam) value);
+				DateUtil.constructParameterWrapper(dateRangeParam, "observationDate", paramWrapper, mapList);
+			} else if (value instanceof DateParam ) {
+				DateParam dateRangeParam = ((DateParam) value);
+				DateUtil.constructParameterWrapper(dateRangeParam, "observationDate", paramWrapper, mapList);
+			}
+			
  			
 //			Date date = ((DateParam) value).getValue();
 //			ParamPrefixEnum prefix = ((DateParam) value).getPrefix();

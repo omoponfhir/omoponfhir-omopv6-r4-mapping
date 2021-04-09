@@ -262,19 +262,14 @@ public class OmopDocumentReference extends BaseOmopResource<DocumentReference, N
 	@Override
 	public Note constructOmop(Long omopId, DocumentReference fhirResource) {
 		Note note = null;
-		if (omopId == null) {
+		
+		//Update
+		if(omopId != null) {
+			note = getMyOmopService().findById(omopId);
+		}
+		if (note == null) {
 			// Create
 			note = new Note();
-		} else {
-			// Update
-			note = getMyOmopService().findById(omopId);
-			if (note == null) {
-				try {
-					throw new FHIRException(fhirResource.getId() + " does not exist");
-				} catch (FHIRException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		
 		// get type
@@ -392,7 +387,7 @@ public class OmopDocumentReference extends BaseOmopResource<DocumentReference, N
 			
 			String contentType = attachment.getContentType();
 			if (contentType != null && !contentType.isEmpty()) {
-				if (!"text/plain".equals(contentType)) {
+				if (!((contentType.toLowerCase()).contains("text/plain".toLowerCase()))) {
 					ThrowFHIRExceptions.unprocessableEntityException("content.attachment must be text/plain");
 				}
 				

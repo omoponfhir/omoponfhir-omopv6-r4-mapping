@@ -433,14 +433,15 @@ public class OmopCondition extends BaseOmopResource<Condition, ConditionOccurren
 	public ConditionOccurrence constructOmop(Long omopId, Condition fhirResource) {
 		// things to update Condition_Occurrence, Concept, FPerson, Provider,
 		// VisitOccurrence
-		ConditionOccurrence conditionOccurrence;
+		ConditionOccurrence conditionOccurrence = null;
 		FPerson fPerson;
 		Provider provider;
 
 		// check for an existing condition
 		if (omopId != null) {
 			conditionOccurrence = conditionOccurrenceService.findById(omopId);
-		} else {
+		} 
+		if(conditionOccurrence == null) {
 			conditionOccurrence = new ConditionOccurrence();
 		}
 
