@@ -36,7 +36,9 @@ import org.hl7.fhir.exceptions.FHIRException;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 
+import ca.uhn.fhir.rest.param.DateRangeParam;
 import ca.uhn.fhir.rest.param.TokenParam;
+import edu.gatech.chai.omoponfhir.omopv6.r4.utilities.DateUtil;
 import edu.gatech.chai.omoponfhir.omopv6.r4.provider.ConditionResourceProvider;
 import edu.gatech.chai.omoponfhir.omopv6.r4.provider.EncounterResourceProvider;
 import edu.gatech.chai.omoponfhir.omopv6.r4.provider.OrganizationResourceProvider;
@@ -272,6 +274,13 @@ public class OmopEncounter extends BaseOmopResource<Encounter, VisitOccurrence, 
 		case "Patient:" + Patient.SP_NAME:
 			addParamlistForPatientIDName(parameter, (String)value, paramWrapper, mapList);
 			break;
+		case Encounter.SP_DATE:
+			DateRangeParam dateRangeParam = ((DateRangeParam) value);
+			DateUtil.constructParameterWrapper(dateRangeParam, "visitStartDate", paramWrapper, mapList);
+			ParameterWrapper paramWrapper1 = new ParameterWrapper();
+			paramWrapper1.setUpperRelationship("or");
+			DateUtil.constructParameterWrapper(dateRangeParam, "visitEndDate", paramWrapper1, mapList);
+			break;	
 		default:
 			mapList = null;
 		}
@@ -420,6 +429,11 @@ public class OmopEncounter extends BaseOmopResource<Encounter, VisitOccurrence, 
 		// }
 		// }
 		// }
+
+		// All defaults
+		visitOccurrence.setVisitSourceConcept(new Concept(0L));
+		visitOccurrence.setAdmittedFromConcept(new Concept(0L));
+		visitOccurrence.setDischargeToConcept(new Concept(0L));
 
 		return visitOccurrence;
 	}
