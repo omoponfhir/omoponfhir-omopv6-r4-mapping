@@ -68,6 +68,19 @@ public class DateUtil {
 		return sqlOperator;
 	}
 	
+	public static void constructParameterWrapper(DateParam dateParam, String dateColumn, ParameterWrapper paramWrapper, List<ParameterWrapper> mapList) {
+		if (dateParam != null) {
+			String lowerSqlOperator = DateUtil.getSqlOperator(dateParam.getPrefix());
+			
+			paramWrapper.setParameterType("Date");
+			paramWrapper.setParameters(Arrays.asList(dateColumn, dateColumn));
+			paramWrapper.setOperators(Arrays.asList(lowerSqlOperator));
+			paramWrapper.setValues(Arrays.asList(String.valueOf(dateParam.getValue().getTime())));
+			paramWrapper.setRelationship("and");
+		}
+		mapList.add(paramWrapper);
+	}
+	
 	public static void constructParameterWrapper(DateRangeParam dateRangeParam, String dateColumn, ParameterWrapper paramWrapper, List<ParameterWrapper> mapList) {
 		// There are 3 possible cases. 
 		// case 1 is range.

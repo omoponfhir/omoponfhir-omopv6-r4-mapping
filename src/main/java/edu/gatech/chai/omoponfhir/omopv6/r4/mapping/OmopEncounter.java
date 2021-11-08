@@ -45,6 +45,7 @@ import edu.gatech.chai.omoponfhir.omopv6.r4.provider.OrganizationResourceProvide
 import edu.gatech.chai.omoponfhir.omopv6.r4.provider.PatientResourceProvider;
 import edu.gatech.chai.omoponfhir.omopv6.r4.provider.PractitionerResourceProvider;
 import edu.gatech.chai.omopv6.dba.service.CareSiteService;
+import edu.gatech.chai.omopv6.dba.service.ConceptService;
 import edu.gatech.chai.omopv6.dba.service.ConditionOccurrenceService;
 import edu.gatech.chai.omopv6.dba.service.FPersonService;
 import edu.gatech.chai.omopv6.dba.service.ParameterWrapper;
@@ -64,6 +65,7 @@ public class OmopEncounter extends BaseOmopResource<Encounter, VisitOccurrence, 
 	private FPersonService fPersonService;
 	private CareSiteService careSiteService;
 	private ProviderService providerService;
+	private ConceptService conceptService;
 	private ConditionOccurrenceService conditionOccurrenceService;
 
 	public OmopEncounter() {
@@ -82,6 +84,7 @@ public class OmopEncounter extends BaseOmopResource<Encounter, VisitOccurrence, 
 		fPersonService = context.getBean(FPersonService.class);
 		careSiteService = context.getBean(CareSiteService.class);
 		providerService = context.getBean(ProviderService.class);
+		conceptService = context.getBean(ConceptService.class);
 		conditionOccurrenceService = context.getBean(ConditionOccurrenceService.class);
 		
 		// Get count and put it in the counts.
@@ -373,8 +376,12 @@ public class OmopEncounter extends BaseOmopResource<Encounter, VisitOccurrence, 
 		}
 
 		/* Set Visit Type - we hardcode this */
-		Concept visitTypeConcept = new Concept();
-		visitTypeConcept.setId(44818518L); // This is Visit derived from EHR
+		Concept visitTypeConcept = conceptService.findById(44818518L);
+		if(visitTypeConcept == null) {
+			visitTypeConcept = new Concept();
+			visitTypeConcept.setId(44818518L); // This is Visit derived from EHR
+		}
+		
 		visitOccurrence.setVisitTypeConcept(visitTypeConcept);
 
 		/* Set provider, which is practitioner in FHIR */
